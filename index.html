@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8"><title>Threads</title>
+    <link rel="stylesheet" href="./style.css"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-xl mx-auto pb-20">
+    <header class="h-16 flex items-center justify-center sticky top-0 bg-[#101010]/80 backdrop-blur-md z-50">
+        <svg class="w-8 h-8 fill-white" viewBox="0 0 192 192"><path d="M141.537 88.9883C140.71 88.5919 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C82.2364 44.7443 69.7731 53.1409 65.0047 68.223"></path></svg>
+    </header>
+    <div id="feed" class="divide-y divide-[#2a2a2a]"></div>
+    <nav class="fixed bottom-0 left-0 right-0 max-w-xl mx-auto border-t border-[#2a2a2a] bg-[#101010] h-16 flex justify-around items-center px-4">
+        <a href="/index.html"><svg class="nav-icon active" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></a>
+        <a href="/post.html"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></a>
+        <a href="/profile.html"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg></a>
+    </nav>
+
+    <script type="module">
+        import { supabase } from './lib/supabase.js';
+
+        async function init() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return location.href = '/login.html';
+
+            const { data: posts } = await supabase.from('posts')
+                .select('*, profiles:user_id(avatar_url, id)')
+                .is('parent_id', null)
+                .order('created_at', { ascending: false });
+
+            posts.forEach(post => renderPost(post, user.id));
+        }
+
+        async function renderPost(post, currentUserId) {
+            const { count: replyCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('parent_id', post.id);
+            const { data: likeData } = await supabase.from('likes').select('*').eq('post_id', post.id);
+            const isLiked = likeData.some(l => l.user_id === currentUserId);
+
+            const div = document.createElement('div');
+            div.className = "p-4 flex gap-3 relative";
+            div.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <a href="/profile.html?uid=${post.user_id}" class="avatar-frame">
+                        <img src="${post.profiles?.avatar_url || 'https://via.placeholder.com/40'}">
+                    </a>
+                    <div class="thread-line"></div>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex justify-between">
+                        <a href="/profile.html?uid=${post.user_id}" class="font-bold text-[14px] hover:underline">${post.username}</a>
+                        <span class="text-zinc-500 text-xs">今</span>
+                    </div>
+                    <p class="text-[15px] mt-1 text-zinc-200">${post.content}</p>
+                    <div class="flex gap-5 mt-4">
+                        <button class="like-btn flex items-center gap-1" data-id="${post.id}">
+                            <svg class="icon-action ${isLiked ? 'liked' : ''}" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span class="text-xs text-zinc-500">${likeData.length || ''}</span>
+                        </button>
+                        <a href="/post.html?replyTo=${post.id}" class="flex items-center gap-1">
+                            <svg class="icon-action" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7c.9 0 1.8.1 2.7.4L21 3l-1.3 4.7c.8 1.2 1.3 2.6 1.3 3.8z"/></svg>
+                            <span class="text-xs text-zinc-500">${replyCount || ''}</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            div.querySelector('.like-btn').onclick = async (e) => {
+                const btn = e.currentTarget;
+                const postId = btn.dataset.id;
+                if (btn.querySelector('svg').classList.contains('liked')) {
+                    await supabase.from('likes').delete().match({ user_id: currentUserId, post_id: postId });
+                } else {
+                    await supabase.from('likes').insert({ user_id: currentUserId, post_id: postId });
+                }
+                location.reload();
+            };
+
+            document.getElementById('feed').appendChild(div);
+        }
+        init();
+    </script>
+</body>
+</html>
