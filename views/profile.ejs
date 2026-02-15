@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title><%= profile.username %> (@<%= profile.username %>)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#101010] text-white p-4 max-w-xl mx-auto pb-24">
+    <div class="flex justify-between items-start mt-8 mb-4">
+        <div>
+            <h1 class="text-2xl font-bold"><%= profile.username %></h1>
+            <p class="text-zinc-500">threads.net</p>
+        </div>
+        <div class="w-20 h-20 rounded-full bg-zinc-800 overflow-hidden">
+            <img src="<%= profile.avatar_url || 'https://via.placeholder.com/80' %>" class="w-full h-full object-cover">
+        </div>
+    </div>
+
+    <p class="text-[15px] mb-6"><%= profile.bio || '自己紹介はありません' %></p>
+
+    <div class="flex gap-4 mb-8">
+        <% if (isMe) { %>
+            <button class="flex-1 py-2 bg-transparent border border-zinc-800 rounded-lg font-bold text-sm">プロフィールを編集</button>
+            <button class="flex-1 py-2 bg-transparent border border-zinc-800 rounded-lg font-bold text-sm">プロフィールのシェア</button>
+        <% } else { %>
+            <button class="flex-1 py-2 bg-white text-black rounded-lg font-bold text-sm">フォロー</button>
+            <button class="flex-1 py-2 bg-transparent border border-zinc-800 rounded-lg font-bold text-sm">メンション</button>
+        <% } %>
+    </div>
+
+    <div class="border-b border-zinc-800 mb-4 flex">
+        <div class="flex-1 text-center pb-3 border-b-2 border-white font-bold">スレッド</div>
+        <div class="flex-1 text-center pb-3 text-zinc-500 font-bold">返信</div>
+    </div>
+
+    <div class="divide-y divide-[#2a2a2a]">
+        <% posts.forEach(post => { %>
+            <div class="py-4 flex gap-3">
+                <div class="w-10 h-10 rounded-full bg-zinc-800 shrink-0 overflow-hidden">
+                    <img src="<%= profile.avatar_url || 'https://via.placeholder.com/40' %>" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <p class="font-bold text-sm"><%= post.username %></p>
+                    <p class="mt-1 text-zinc-200"><%= post.content %></p>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 max-w-xl mx-auto bg-[#101010] border-t border-[#2a2a2a] h-16 flex justify-around items-center">
+        <a href="/"><svg class="w-6 h-6 stroke-zinc-500 fill-none" viewBox="0 0 24 24" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></a>
+        <a href="/post"><svg class="w-6 h-6 stroke-zinc-500 fill-none" viewBox="0 0 24 24" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></a>
+        <a href="/profile"><svg class="w-6 h-6 stroke-white fill-none" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg></a>
+    </nav>
+</body>
+</html>
