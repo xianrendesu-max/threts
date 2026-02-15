@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Signup - Threads</title>
+    <meta charset="UTF-8"><title>Signup - Threads</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#101010] text-white flex items-center justify-center min-h-screen p-6">
     <div class="w-full max-w-sm text-center">
         <h1 class="text-4xl font-black mb-10 tracking-tighter">Threads</h1>
         <form action="/signup" method="POST" class="space-y-3">
-            <input name="username" type="text" placeholder="ユーザーネーム" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1 focus:ring-zinc-700" required>
-            <input name="email" type="email" placeholder="メールアドレス" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1 focus:ring-zinc-700" required>
-            <input name="password" type="password" placeholder="パスワード" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1 focus:ring-zinc-700" required>
-            <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-xl mt-4">新規登録</button>
-            <a href="/login" class="block text-zinc-500 text-sm mt-4">すでにアカウントをお持ちの方はこちら</a>
+            <input name="username" type="text" placeholder="ユーザーネーム" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1" required>
+            <input name="email" type="email" placeholder="メールアドレス" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1" required>
+            <input name="password" type="password" placeholder="パスワード" class="w-full bg-zinc-900 border-none rounded-xl p-4 focus:ring-1" required>
+            <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-xl mt-4">アカウント作成</button>
+            <a href="/login" class="block text-zinc-500 text-sm mt-4">ログインはこちら</a>
         </form>
     </div>
 </body>
